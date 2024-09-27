@@ -1,0 +1,137 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use Filament\Forms;
+use Filament\Tables;
+use App\Models\Article;
+use Filament\Forms\Set;
+use Filament\Forms\Form;
+use Illuminate\View\View;
+use Filament\Tables\Table;
+use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
+use Filament\Resources\Resource;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Section;
+use App\Forms\Components\ContentEditor;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\ViewField;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\RichEditor;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\MarkdownEditor;
+use App\Filament\Resources\ArticleResource\Pages;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\ArticleResource\RelationManagers;
+
+class ArticleResource extends Resource
+{
+    protected static ?string $model = Article::class;
+
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Group::make()->schema([
+                    Section::make('Artikel')->columns(2)->schema([
+                        TextInput::make('title')->live(debounce: 700)->afterStateUpdated(fn(Set $set, ?string $state) => $set('slug', Str::slug($state)))->required(),
+                        TextInput::make('slug')->required()->readOnly(),
+                        ContentEditor::make(name: 'content')->label('content')->id(1)->columnSpanFull()->required()
+                    ]),
+                ])->columns(2)->columnSpan(2),
+                Group::make()->schema([
+                    Section::make('image')->schema([
+                        FileUpload::make('image')
+                            ->image()
+                            ->imageEditor()->image()->directory('article')->required(),
+                    ]),
+
+                    Section::make('Categorie & Tags')->schema([
+                        Select::make('category_id')->relationship(name: 'categories', titleAttribute: 'name')->native(false)->required(),
+                        CheckboxList::make('tags')->relationship('tags', 'name')->columns(2)->gridDirection('row'),
+                    ]),
+                ])->columns(2),
+            ])->columns(3);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('No.')
+                    ->rowIndex(),
+                TextColumn::make('title')->words(3),
+                TextColumn::make('slug')->limit(10)
+                    ->tooltip(function (TextColumn $column): ?string {
+                        $state = $column->getState();
+
+                        if (strlen($state) <= $column->getCharacterLimit()) {
+                            return null;
+                        }
+
+                        // Only render the tooltip if the column content exceeds the length limit.
+                        return $state;
+                    }),
+                TextColumn::make('status')->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'draft' => 'gray',
+                        'published' => 'success',
+                    }),
+                TextColumn::make('published_at')->default('-'),
+                TextColumn::make('viewers')->state(function ($record) {
+                    return  Article::withCount('viewers')->find($record->id)->viewers_count;
+                }),
+                ImageColumn::make('image'),
+
+            ])
+            ->filters([
+                //
+            ])
+            ->actions([
+                Tables\Actions\Action::make('Publish')->label("Publish")
+                    ->button()->hidden(fn(Article $record) => $record->published_at)
+                    ->icon('heroicon-o-arrow-path')
+                    ->requiresConfirmation()->modalIcon('heroicon-o-arrow-path')
+                    ->action(fn(Article $record) => $record->update(['published_at' => Carbon::today()->toDateString(), 'status' => 'published'])),
+                Tables\Actions\Action::make('Draft')->label("Draft")
+                    ->button()->hidden(fn(Article $record) => !$record->published_at)
+                    ->icon('heroicon-o-arrow-path')
+                    ->requiresConfirmation()->modalIcon('heroicon-o-arrow-path')
+                    ->action(fn(Article $record) => $record->update(['published_at' => null, 'status' => 'draft'])),
+                Tables\Actions\Action::make('View')->modalContent(fn(Article $record): View => view(
+                    'filament.pages.actions.view-article',
+                    ['record' => $record],
+                ))->modalSubmitAction(false)->modalCancelAction(false),
+                Tables\Actions\EditAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListArticles::route('/'),
+            'create' => Pages\CreateArticle::route('/create'),
+            'edit' => Pages\EditArticle::route('/{record}/edit'),
+        ];
+    }
+}
