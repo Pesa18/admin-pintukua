@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use Filament\Forms;
+use App\Models\Role;
 use App\Models\User;
 use Filament\Tables;
 use Filament\Forms\Form;
@@ -11,6 +12,7 @@ use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Hash;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Resources\Pages\CreateRecord;
 use App\Filament\Resources\UserAdminResource\Pages;
@@ -23,6 +25,8 @@ class UserAdminResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user';
     protected static ?string $navigationGroup = 'User Management';
+    protected static ?string $tenantRelationshipName = 'userTeams';
+    // protected static bool $isScopedToTenant = false;
 
     public static function form(Form $form): Form
     {
@@ -32,6 +36,9 @@ class UserAdminResource extends Resource
                 Forms\Components\TextInput::make('email')->unique(column: 'email', ignoreRecord: true)->required()->email(),
                 Forms\Components\Select::make('roles')
                     ->relationship('roles', 'name')
+                    ->saveRelationshipsUsing(function (Model $record, $state) {
+                        $record->roles()->syncWithPivotValues($state, [config('permission.column_names.team_foreign_key') => getPermissionsTeamId()]);
+                    })
                     ->multiple()
                     ->preload()
                     ->searchable(),

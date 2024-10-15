@@ -2,143 +2,105 @@
 
 namespace App\Policies;
 
-use App\Models\User;
+use Illuminate\Auth\Access\Response;
 
-use Illuminate\Auth\Access\HandlesAuthorization;
+use App\Models\User;
 
 class UserPolicy
 {
-    use HandlesAuthorization;
-
     /**
      * Determine whether the user can view any models.
-     *
-     * @param  \App\Models\User  $user
-     * @return bool
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_user::admin');
+        return $user->checkPermissionTo('view-any User');
     }
 
     /**
      * Determine whether the user can view the model.
-     *
-     * @param  \App\Models\User  $user
-     * @return bool
      */
-    public function view(User $user): bool
+    public function view(User $user, User $model): bool
     {
-        return $user->can('view_user::admin');
+        return $user->checkPermissionTo('view User');
     }
 
     /**
      * Determine whether the user can create models.
-     *
-     * @param  \App\Models\User  $user
-     * @return bool
      */
     public function create(User $user): bool
     {
-        return $user->can('create_user::admin');
+        return true;
     }
 
     /**
      * Determine whether the user can update the model.
-     *
-     * @param  \App\Models\User  $user
-     * @return bool
      */
-    public function update(User $user): bool
+    public function update(User $user, User $model): bool
     {
-        return $user->can('update_user::admin');
+        return true;
     }
 
     /**
      * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @return bool
      */
-    public function delete(User $user): bool
+    public function delete(User $user, User $model): bool
     {
-        return $user->can('delete_user::admin');
+        return $user->checkPermissionTo('delete User');
     }
 
     /**
-     * Determine whether the user can bulk delete.
-     *
-     * @param  \App\Models\User  $user
-     * @return bool
+     * Determine whether the user can delete any models.
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_user::admin');
+        return $user->checkPermissionTo('delete-any User');
     }
 
     /**
-     * Determine whether the user can permanently delete.
-     *
-     * @param  \App\Models\User  $user
-     * @return bool
+     * Determine whether the user can restore the model.
      */
-    public function forceDelete(User $user): bool
+    public function restore(User $user, User $model): bool
     {
-        return $user->can('force_delete_user::admin');
+        return $user->checkPermissionTo('restore User');
     }
 
     /**
-     * Determine whether the user can permanently bulk delete.
-     *
-     * @param  \App\Models\User  $user
-     * @return bool
-     */
-    public function forceDeleteAny(User $user): bool
-    {
-        return $user->can('force_delete_any_user::admin');
-    }
-
-    /**
-     * Determine whether the user can restore.
-     *
-     * @param  \App\Models\User  $user
-     * @return bool
-     */
-    public function restore(User $user): bool
-    {
-        return $user->can('restore_user::admin');
-    }
-
-    /**
-     * Determine whether the user can bulk restore.
-     *
-     * @param  \App\Models\User  $user
-     * @return bool
+     * Determine whether the user can restore any models.
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_user::admin');
+        return $user->checkPermissionTo('restore-any User');
     }
 
     /**
-     * Determine whether the user can bulk restore.
-     *
-     * @param  \App\Models\User  $user
-     * @return bool
+     * Determine whether the user can replicate the model.
      */
-    public function replicate(User $user): bool
+    public function replicate(User $user, User $model): bool
     {
-        return $user->can('replicate_user::admin');
+        return $user->checkPermissionTo('replicate User');
     }
 
     /**
-     * Determine whether the user can reorder.
-     *
-     * @param  \App\Models\User  $user
-     * @return bool
+     * Determine whether the user can reorder the models.
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_user::admin');
+        return $user->checkPermissionTo('reorder User');
+    }
+
+    /**
+     * Determine whether the user can permanently delete the model.
+     */
+    public function forceDelete(User $user, User $model): bool
+    {
+        return $user->checkPermissionTo('force-delete User');
+    }
+
+    /**
+     * Determine whether the user can permanently delete any models.
+     */
+    public function forceDeleteAny(User $user): bool
+    {
+        return $user->checkPermissionTo('force-delete-any User');
     }
 }

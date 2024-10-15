@@ -29,13 +29,19 @@ use Filament\Forms\Components\MarkdownEditor;
 use App\Filament\Resources\ArticleResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ArticleResource\RelationManagers;
+use Filament\Facades\Filament;
 
 class ArticleResource extends Resource
 {
     protected static ?string $model = Article::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $tenantRelationshipName = 'articleTeams';
 
+    public static function isScopedToTenant(): bool
+    {
+        return Filament::getTenant()->id > 1;
+    }
     public static function form(Form $form): Form
     {
         return $form
@@ -87,7 +93,7 @@ class ArticleResource extends Resource
                     }),
                 TextColumn::make('published_at')->default('-'),
                 TextColumn::make('viewers')->state(function ($record) {
-                    return  Article::withCount('viewers')->find($record->id)->viewers_count;
+                    return  Article::withCount('viewers')->find($record->uuid)->viewers_count;
                 }),
                 ImageColumn::make('image'),
 
@@ -95,12 +101,17 @@ class ArticleResource extends Resource
             ->filters([
                 //
             ])
+            ->modifyQueryUsing(function (Builder $query) {
+                // $query->where('team_id', getPermissionsTeamId());
+
+                // dd(getPermissionsTeamId());
+            })
             ->actions([
                 Tables\Actions\Action::make('Publish')->label("Publish")
                     ->button()->hidden(fn(Article $record) => $record->published_at)
                     ->icon('heroicon-o-arrow-path')
                     ->requiresConfirmation()->modalIcon('heroicon-o-arrow-path')
-                    ->action(fn(Article $record) => $record->update(['published_at' => Carbon::today()->toDateString(), 'status' => 'published'])),
+                    ->action(fn(Article $record) => $record->update(['published_at' => Carbon::now(), 'status' => 'published'])),
                 Tables\Actions\Action::make('Draft')->label("Draft")
                     ->button()->hidden(fn(Article $record) => !$record->published_at)
                     ->icon('heroicon-o-arrow-path')

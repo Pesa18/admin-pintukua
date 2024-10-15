@@ -15,13 +15,14 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\TagResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\TagResource\RelationManagers;
+use Filament\Tables\Columns\TextColumn;
 
 class TagResource extends Resource
 {
     protected static ?string $model = Tag::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
+    protected static bool $isScopedToTenant = false;
     public static function form(Form $form): Form
     {
         return $form
@@ -38,7 +39,8 @@ class TagResource extends Resource
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('name'),
+                TextColumn::make('slug')
             ])
             ->filters([
                 //

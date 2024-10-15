@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('article_id')->constrained('articles')->onDelete('cascade');
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
+            $table->foreignId('team_id')->constrained();
             $table->integer('view_count')->default(0);
             $table->timestamps();
         });
