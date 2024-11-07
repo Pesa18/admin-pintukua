@@ -3,25 +3,25 @@
 namespace App\Policies;
 
 use Illuminate\Auth\Access\Response;
-use App\Models\Team;
+use App\Models\Employee;
 use App\Models\User;
 
-class TeamPolicy
+class EmployeePolicy
 {
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return $user->checkPermissionTo('view-any Team');
+        return $user->checkPermissionTo('view-any Employee');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Team $team): bool
+    public function view(User $user, Employee $employee): bool
     {
-        return $user->checkPermissionTo('view Team');
+        return $user->checkPermissionTo('view Employee');
     }
 
     /**
@@ -29,24 +29,23 @@ class TeamPolicy
      */
     public function create(User $user): bool
     {
-
-        return $user->checkPermissionTo('create Team');
+        return $user->checkPermissionTo('create Employee');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Team $team): bool
+    public function update(User $user, Employee $employee): bool
     {
-        return $user->checkPermissionTo('update Team');
+        return $user->checkPermissionTo('update Employee');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Team $team): bool
+    public function delete(User $user, Employee $employee): bool
     {
-        return $user->checkPermissionTo('delete Team');
+        return $user->checkPermissionTo('delete Employee');
     }
 
     /**
@@ -54,15 +53,15 @@ class TeamPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->checkPermissionTo('delete-any Team');
+        return $user->checkPermissionTo('delete-any Employee');
     }
 
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Team $team): bool
+    public function restore(User $user, Employee $employee): bool
     {
-        return $user->checkPermissionTo('restore Team');
+        return $user->checkPermissionTo('restore Employee');
     }
 
     /**
@@ -70,15 +69,15 @@ class TeamPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->checkPermissionTo('restore-any Team');
+        return $user->checkPermissionTo('restore-any Employee');
     }
 
     /**
      * Determine whether the user can replicate the model.
      */
-    public function replicate(User $user, Team $team): bool
+    public function replicate(User $user, Employee $employee): bool
     {
-        return $user->checkPermissionTo('replicate Team');
+        return $user->checkPermissionTo('replicate Employee');
     }
 
     /**
@@ -86,15 +85,15 @@ class TeamPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->checkPermissionTo('reorder Team');
+        return $user->checkPermissionTo('reorder Employee');
     }
 
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Team $team): bool
+    public function forceDelete(User $user, Employee $employee): bool
     {
-        return $user->checkPermissionTo('force-delete Team');
+        return $user->checkPermissionTo('force-delete Employee');
     }
 
     /**
@@ -102,6 +101,6 @@ class TeamPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->checkPermissionTo('force-delete-any Team');
+        return $user->checkPermissionTo('force-delete-any Employee');
     }
 }

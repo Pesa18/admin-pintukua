@@ -13,12 +13,17 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\UserappResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\UserappResource\RelationManagers;
+use App\Models\UserAccounts;
+use Filament\Tables\Columns\TextColumn;
 
 class UserappResource extends Resource
 {
-    protected static ?string $model = User::class;
-
+    protected static ?string $model = UserAccounts::class;
+    protected static ?string $navigationLabel = 'User App';
+    protected static ?string $navigationGroup = 'APP';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static bool $isScopedToTenant = false;
+
 
     public static function form(Form $form): Form
     {
@@ -32,7 +37,8 @@ class UserappResource extends Resource
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('name'),
+                TextColumn::make('email')
             ])
             ->filters([
                 //

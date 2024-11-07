@@ -3,6 +3,7 @@
 namespace App\Filament\Pages\Tenancy;
 
 use App\Models\Team;
+use App\Models\User;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Pages\Tenancy\RegisterTenant;
@@ -10,6 +11,14 @@ use Filament\Pages\Tenancy\RegisterTenant;
 class RegisterTeam extends RegisterTenant
 {
 
+    public static function canView(): bool
+    {
+        $superadmin = auth()->user()->team_id;
+        if ($superadmin == 1) {
+            return true;
+        }
+        return false;
+    }
 
     public static function getLabel(): string
     {

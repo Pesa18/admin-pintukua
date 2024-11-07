@@ -39,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
 
             // dd($user->isSuperAdmin());
             // dd(Auth::user()->getRoleNames());
+            // dd($user->isUserkua());
 
             return $user->isSuperAdmin() ? true : null;
             // return true;

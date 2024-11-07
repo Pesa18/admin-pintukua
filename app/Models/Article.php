@@ -43,7 +43,6 @@ class Article extends Model
     {
         static::addGlobalScope('team', function (Builder $query) {
             if (auth()->hasUser()) {
-
                 if (!Filament::getTenant()->id == 1) {
                     $query->where('team_id', getPermissionsTeamId());
                     // or with a `team` relationship defined:
@@ -51,5 +50,9 @@ class Article extends Model
                 }
             }
         });
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class)->withoutGlobalScopes();
     }
 }

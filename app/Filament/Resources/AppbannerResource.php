@@ -2,29 +2,46 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\AppbannerResource\Pages;
-use App\Filament\Resources\AppbannerResource\RelationManagers;
-use App\Models\Appbanner;
-use App\Models\User;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Forms\Form;
+use App\Models\BannerApp;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\DateTimePicker;
+use App\Filament\Resources\AppbannerResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\AppbannerResource\RelationManagers;
+use Filament\Tables\Columns\TextColumn;
 
 class AppbannerResource extends Resource
 {
-    protected static ?string $model = User::class;
+    protected static ?string $model = BannerApp::class;
 
+
+    protected static ?string $navigationLabel = 'Banner App';
+    protected static ?string $navigationGroup = 'APP';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static bool $isScopedToTenant = false;
+
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                //
+                TextInput::make('title'),
+                TextInput::make('description'),
+                TextInput::make('link'),
+                DateTimePicker::make('start_at'),
+                DateTimePicker::make('end_at'),
+                Checkbox::make('is_active'),
+                FileUpload::make('image_path')->image()
+                    ->imageEditor()->image()->directory('banner-info')->required(),
             ]);
     }
 
@@ -32,7 +49,11 @@ class AppbannerResource extends Resource
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('title'),
+                TextColumn::make('is_active')->badge()->color(fn(string $state): string => match ($state) {
+                    '1' => 'success'
+                })
+
             ])
             ->filters([
                 //

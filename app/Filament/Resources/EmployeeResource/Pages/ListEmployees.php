@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\UserkuaResource\Pages;
+namespace App\Filament\Resources\EmployeeResource\Pages;
 
-use App\Filament\Resources\UserkuaResource;
+use App\Filament\Resources\EmployeeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-class ListUserkuas extends ListRecords
+class ListEmployees extends ListRecords
 {
-    protected static string $resource = UserkuaResource::class;
+    protected static string $resource = EmployeeResource::class;
 
     protected function getHeaderActions(): array
     {

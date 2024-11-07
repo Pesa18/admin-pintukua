@@ -40,7 +40,15 @@ class ArticleResource extends Resource
 
     public static function isScopedToTenant(): bool
     {
-        return Filament::getTenant()->id > 1;
+        $tenantId = Filament::getTenant()->id;
+        $isNotInList = !in_array($tenantId, [2, 3, 5]);
+
+        // This will be true only if the tenant ID is NOT 2, 3, or 5
+        if ($isNotInList) {
+            return false;
+        } else {
+            return true;
+        }
     }
     public static function form(Form $form): Form
     {
@@ -92,6 +100,7 @@ class ArticleResource extends Resource
                         'published' => 'success',
                     }),
                 TextColumn::make('published_at')->default('-'),
+                TextColumn::make('user.name'),
                 TextColumn::make('viewers')->state(function ($record) {
                     return  Article::withCount('viewers')->find($record->uuid)->viewers_count;
                 }),

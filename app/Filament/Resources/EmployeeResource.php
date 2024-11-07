@@ -2,21 +2,20 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\EmployeeResource\Pages;
+use App\Filament\Resources\EmployeeResource\RelationManagers;
+use App\Models\Employee;
 use Filament\Forms;
-use App\Models\User;
-use Filament\Tables;
-use App\Models\Userkua;
 use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Resources\UserkuaResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\UserkuaResource\RelationManagers;
 
-class UserkuaResource extends Resource
+class EmployeeResource extends Resource
 {
-    protected static ?string $model = User::class;
+    protected static ?string $model = Employee::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -57,9 +56,9 @@ class UserkuaResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUserkuas::route('/'),
-            'create' => Pages\CreateUserkua::route('/create'),
-            'edit' => Pages\EditUserkua::route('/{record}/edit'),
+            'index' => Pages\ListEmployees::route('/'),
+            'create' => Pages\CreateEmployee::route('/create'),
+            'edit' => Pages\EditEmployee::route('/{record}/edit'),
         ];
     }
 }

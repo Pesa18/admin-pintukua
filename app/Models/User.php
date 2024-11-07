@@ -8,6 +8,7 @@ use Althinect\FilamentSpatieRolesPermissions\Concerns\HasSuperAdmin;
 use App\Models\Role as ModelsRole;
 use Filament\Panel;
 use App\Models\Team;
+use App\Traits\HasUserkua;
 use Filament\Facades\Filament;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Traits\HasRoles;
@@ -25,7 +26,7 @@ use Spatie\Permission\Models\Role;
 
 class User extends Authenticatable implements HasTenants
 {
-    use HasFactory, Notifiable, HasRoles, HasSuperAdmin;
+    use HasFactory, Notifiable, HasRoles, HasSuperAdmin, HasUserkua;
 
     /**
      * The attributes that are mass assignable.
@@ -83,9 +84,6 @@ class User extends Authenticatable implements HasTenants
     {
         static::addGlobalScope('team', function (Builder $query) {
             if (auth()->hasUser()) {
-                // if (auth()->user()->isSuperAdmin()) {
-                //     return true;
-                // }
                 $query->where('team_id', getPermissionsTeamId());
                 // or with a `team` relationship defined:
                 $query->whereBelongsTo(auth()->user()->teams);
