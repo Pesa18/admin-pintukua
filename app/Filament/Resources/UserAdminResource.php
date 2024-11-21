@@ -6,13 +6,17 @@ use Filament\Forms;
 use App\Models\Role;
 use App\Models\User;
 use Filament\Tables;
+use App\Models\KuaTeam;
+use Filament\Forms\Set;
 use Filament\Forms\Form;
 use Filament\Pages\Page;
 use Filament\Tables\Table;
+use App\Models\ProfileCompany;
 use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Hash;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Resources\Pages\CreateRecord;
 use App\Filament\Resources\UserAdminResource\Pages;
@@ -26,7 +30,7 @@ class UserAdminResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-user';
     protected static ?string $navigationGroup = 'User Management';
     protected static ?string $tenantRelationshipName = 'userTeams';
-    // protected static bool $isScopedToTenant = false;
+    protected static bool $isScopedToTenant = false;
 
     public static function form(Form $form): Form
     {
@@ -47,6 +51,13 @@ class UserAdminResource extends Resource
                     ->dehydrateStateUsing(fn(string $state): string => Hash::make($state))
                     ->dehydrated(fn(?string $state): bool => filled($state))
                     ->required(fn(Page $livewire): bool => $livewire instanceof CreateRecord),
+
+                Forms\Components\Select::make('id_kua')->hidden(!auth()->user()->isTeamkua())->dehydrated(auth()->user()->isTeamkua())->rules('required')->markAsRequired(true)->validationMessages([
+                    'required' => 'Nama Harus diisi!',
+                ])->options(ProfileCompany::all()->pluck('name', 'id_kua'))->afterStateHydrated(function (Set $set, $record) {
+
+                    return $set('id_kua', $record ? $record->kua()->first()?->id_kua : null);
+                })
             ]);
     }
 
@@ -56,13 +67,22 @@ class UserAdminResource extends Resource
             ->columns([
                 TextColumn::make('name'),
                 TextColumn::make('roles.name'),
-                TextColumn::make('email')
+                TextColumn::make('email'),
+                TextColumn::make('kua.id_kua')->default('Bukan User KUA')
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('id_kua')->form([
+                    TextInput::make('id_kua')
+                ])->action(function (array $data,  $record): void {
+                    KuaTeam::create([
+                        'id_kua' => $data['id_kua'],
+                        'user_id' => $record->id,
+                    ]);
+                })
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

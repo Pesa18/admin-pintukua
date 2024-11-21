@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('profile_companies', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('user_id')->constrained('users')->onDelete('set null');
-            $table->integer('id_kua');
+            $table->unsignedBigInteger('id_kua')->unique();
             $table->string('address');
             $table->string('coordinates');
             $table->integer('id_kecamatan');

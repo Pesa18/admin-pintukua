@@ -43,16 +43,18 @@ class Article extends Model
     {
         static::addGlobalScope('team', function (Builder $query) {
             if (auth()->hasUser()) {
-                if (!Filament::getTenant()->id == 1) {
-                    $query->where('team_id', getPermissionsTeamId());
-                    // or with a `team` relationship defined:
-                    $query->whereBelongsTo(auth()->user()->teams);
-                }
+                $query->where('team_id', getPermissionsTeamId());
+                // or with a `team` relationship defined:
+                $query->whereBelongsTo(auth()->user()->teams);
             }
         });
     }
     public function user()
     {
         return $this->belongsTo(User::class)->withoutGlobalScopes();
+    }
+    public function kua()
+    {
+        return $this->hasMany(KuaTeam::class, 'user_id', 'user_id');
     }
 }

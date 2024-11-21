@@ -38,17 +38,25 @@ class ArticleResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $tenantRelationshipName = 'articleTeams';
 
+    public static function getEloquentQuery(): Builder
+    {
+        $id_kua = auth()->user()->kua()->first()?->id_kua;
+
+        if (auth()->user()->isSuperAdmin()) {
+            return parent::getEloquentQuery()->withoutGlobalScopes();
+        }
+
+        return parent::getEloquentQuery()->whereHas('kua', function ($query) use ($id_kua) {
+            $query->where('id_kua', $id_kua);
+        });
+    }
+
     public static function isScopedToTenant(): bool
     {
-        $tenantId = Filament::getTenant()->id;
-        $isNotInList = !in_array($tenantId, [2, 3, 5]);
-
-        // This will be true only if the tenant ID is NOT 2, 3, or 5
-        if ($isNotInList) {
+        if (auth()->user()->isSuperAdmin()) {
             return false;
-        } else {
-            return true;
         }
+        return true;
     }
     public static function form(Form $form): Form
     {
@@ -101,8 +109,9 @@ class ArticleResource extends Resource
                     }),
                 TextColumn::make('published_at')->default('-'),
                 TextColumn::make('user.name'),
+                TextColumn::make('team.name'),
                 TextColumn::make('viewers')->state(function ($record) {
-                    return  Article::withCount('viewers')->find($record->uuid)->viewers_count;
+                    return  Article::withoutGlobalScopes()->withCount('viewers')->find($record->uuid)?->viewers_count;
                 }),
                 ImageColumn::make('image'),
 

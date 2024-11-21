@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Employee extends Model
 {
     use HasFactory;
-
+    protected $guarded = ['id'];
     public function team()
     {
         return $this->belongsTo(Team::class);

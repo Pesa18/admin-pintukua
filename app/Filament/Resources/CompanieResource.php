@@ -1,50 +1,46 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace App\Filament\Resources;
 
+use Filament\Forms;
+use Filament\Tables;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use App\Models\Companie;
 use Filament\Forms\Form;
-use Filament\Pages\Page;
-use Illuminate\Http\Request;
-use Filament\Infolists\Infolist;
+use Filament\Tables\Table;
+use App\Models\ProfileCompany;
+use Filament\Resources\Resource;
 use Dotswan\MapPicker\Fields\Map;
-use Illuminate\Support\Collection;
 use Filament\Forms\Components\Group;
 use Illuminate\Support\Facades\Http;
 use Filament\Forms\Components\Select;
 use Illuminate\Support\Facades\Cache;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Contracts\HasForms;
+use Filament\Tables\Actions\EditAction;
 use Illuminate\Validation\Rules\Unique;
 use Filament\Forms\Components\TextInput;
-use Dotswan\MapPicker\Infolists\MapEntry;
 use Filament\Forms\Components\FileUpload;
+use Illuminate\Database\Eloquent\Builder;
 use Stevebauman\Location\Facades\Location;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Contracts\HasInfolists;
-use Filament\Forms\Concerns\InteractsWithForms;
-use App\Models\ProfileCompany as ModelsProfileCompany;
-use Filament\Infolists\Components\Grid;
-use Filament\Infolists\Components\ImageEntry;
-use Filament\Infolists\Concerns\InteractsWithInfolists;
-use Filament\Infolists\Components\Section as ComponentsSection;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use App\Filament\Resources\CompanieResource\Pages;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\CompanieResource\RelationManagers;
+use App\Filament\Resources\CompanieResource\Pages\EditCompanie;
+use App\Filament\Resources\CompanieResource\Pages\ListCompanies;
+use App\Filament\Resources\CompanieResource\Pages\CreateCompanie;
 
-class ProfileCompany extends Page implements HasForms, HasInfolists
+class CompanieResource extends Resource
 {
-    use InteractsWithForms;
-    use InteractsWithInfolists;
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static ?string $model = ProfileCompany::class;
+    protected static bool $isScopedToTenant = false;
 
-    protected static string $view = 'filament.pages.profile-company';
-    public  $location = null;
-    public ?string $id_provinsi = null;
-    public ?string $id_kabupaten = null;
-    public ?string $id_kecamatan = null;
-    public ?array $dataForm = [];
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
 
-    public function getDefaultLocation()
+    public static function getDefaultLocation()
     {
         $location = Location::get(request()->ip());
 
@@ -54,36 +50,9 @@ class ProfileCompany extends Page implements HasForms, HasInfolists
         ];
     }
 
-    public static function canAccess(): bool
+    public static function form(Form $form): Form
     {
-
-        return auth()->user()->isUserkua();
-    }
-
-    public function mount(): void
-    {
-
-
-        $data = auth()->user()->kua()->first();
-
-        if ($data) {
-            $this->form->fill($data->toArray());
-        }
-    }
-
-    protected function getViewData(): array
-    {
-        $data = auth()->user()->kua()->first();
-
-        // dd($user_id);
-        return [
-            'data' => $data
-        ];
-    }
-
-    public function form(Form $form): Form
-    {
-        $location = $this->getDefaultLocation();
+        $location = self::getDefaultLocation();
         return $form->schema([
             Group::make()->schema([
                 Section::make('Data KUA')->schema([
@@ -97,10 +66,7 @@ class ProfileCompany extends Page implements HasForms, HasInfolists
                         'required' => 'Kode KUA Harus diisi!',
                         'numeric' => 'Harus Berupa Angka!',
                         'unique' => "Kode KUA Sudah ada dalam database"
-                    ])->unique(modifyRuleUsing: function (Unique $rule) {
-
-                        return $rule->ignore(auth()->user()->kua()->first()->id_kua, 'id_kua');
-                    }),
+                    ])->unique(column: 'id_kua', ignoreRecord: true),
                     TextInput::make('email')->rules('required|email')->markAsRequired(true)->validationMessages([
                         'required' => 'Email Harus diisi!',
                         'email' => 'Harus Berupa Email'
@@ -121,7 +87,7 @@ class ProfileCompany extends Page implements HasForms, HasInfolists
                 Section::make('Alamat')->schema([
                     Select::make('id_provinsi')->options(
                         function () {
-                            return collect($this->getProvinsi())->pluck('name', 'id');
+                            return collect(self::getProvinsi())->pluck('name', 'id');
                         }
                     )->label('Provinsi')->live()->rules('required')->markAsRequired(true)->validationMessages([
                         'required' => 'Provinsi Harus diisi!',
@@ -131,7 +97,7 @@ class ProfileCompany extends Page implements HasForms, HasInfolists
                             $provinsiId = $get('id_provinsi');
                             if ($provinsiId) {
                                 // Mengambil data kota dari API berdasarkan provinsi yang dipilih
-                                return collect($this->getKabupaten($get('id_provinsi')))->pluck('name', 'id');
+                                return collect(self::getKabupaten($get('id_provinsi')))->pluck('name', 'id');
                             }
 
                             return [];
@@ -144,7 +110,7 @@ class ProfileCompany extends Page implements HasForms, HasInfolists
                             $kabupatenId = $get('id_kabupaten');
                             if ($kabupatenId) {
                                 // Mengambil data kota dari API berdasarkan provinsi yang dipilih
-                                return collect($this->getKecamatan($get('id_kabupaten')))->pluck('name', 'id');
+                                return collect(self::getKecamatan($get('id_kabupaten')))->pluck('name', 'id');
                             }
 
                             return [];
@@ -168,10 +134,10 @@ class ProfileCompany extends Page implements HasForms, HasInfolists
                         $set('coordinates', json_encode(['latitude' => $state['lat'], 'longitude' => $state['lng']]));
                     })
                     ->afterStateHydrated(function ($state, $record, Set $set): void {
-                        if ($this->getViewData()['data']) {
-                            $set('location', ['lat' => json_decode($this->getViewData()['data']->coordinates)->latitude, 'lng' => json_decode($this->getViewData()['data']->coordinates)->longitude]);
+                        if ($record) {
+                            $set('location', ['lat' => json_decode($record->coordinates)->latitude, 'lng' => json_decode($record->coordinates)->longitude]);
                         } else {
-                            $set('location', ['lat' => $this->getDefaultLocation()['latitude'], 'lng' => $this->getDefaultLocation()['longitude']]);
+                            $set('location', ['lat' => self::getDefaultLocation()['latitude'], 'lng' => self::getDefaultLocation()['longitude']]);
                         }
                     })
                     ->extraStyles([
@@ -201,62 +167,45 @@ class ProfileCompany extends Page implements HasForms, HasInfolists
                 ])->columns(2)
             ])->columnSpanFull()
 
-        ])->columns(3)->statePath('dataForm')->model(ModelsProfileCompany::class);
+        ])->columns(3);
     }
 
-    public function profileInfolist(Infolist $infolist): Infolist
+    public static function table(Table $table): Table
     {
-        if ($this->getViewData()['data']) {
-            return $infolist
-                ->record(auth()->user()->kua()->first())
-                ->state($this->getViewData()['data']->toArray())
-                ->schema([
-                    Grid::make()->schema([
-                        ComponentsSection::make('Data KUA')->schema([
-                            TextEntry::make('name'),
-                            TextEntry::make('id_kua'),
-                            TextEntry::make('address'),
-                            TextEntry::make('id_provinsi')->formatStateUsing(fn(string $state): string => $this->provinsi($state))->label('Provinsi'),
-                            TextEntry::make('id_kabupaten')->formatStateUsing(fn(string $state): string => $this->kabupaten($state))->label('Kabupaten'),
-                            TextEntry::make('id_kecamatan')->formatStateUsing(fn(string $state): string => $this->kecamatan($state))->label('Kecamatan'),
-                        ])->columns(2)->columnSpan(2),
-                        ImageEntry::make('foto')
-                    ])->columns(3),
-
-
-                    ComponentsSection::make('Location')->schema([
-                        MapEntry::make('location')
-                            ->extraStyles([
-                                'border-radius: 10px'
-                            ])
-                            ->state(fn($record) => $record ? ['lat' => json_decode($record?->coordinates)->latitude, 'lng' => json_decode($record?->coordinates)->longitude] : [])
-                            ->showMarker()
-                            ->markerColor("#22c55eff")
-                            ->showFullscreenControl()
-                            ->draggable(false)
-                            ->zoom(15),
-                        TextEntry::make('coordinates')
-                    ]),
-
-
-                ]);
-        }
-        return $infolist->schema([]);
+        return $table
+            ->columns([
+                //
+            ])
+            ->filters([
+                //
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
     }
 
-
-    public function openNewUserModal()
+    public static function getRelations(): array
     {
-        // Beberapa logika atau proses
-        return $this->dispatch('open-modal', id: 'create-profile');
-    }
-    public function openEditUserModal()
-    {
-        // Beberapa logika atau proses
-        return $this->dispatch('open-modal', id: 'edit-profile');
+        return [
+            //
+        ];
     }
 
-    public function provinsi($id): string
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListCompanies::route('/'),
+            'create' => Pages\CreateCompanie::route('/create'),
+            'edit' => Pages\EditCompanie::route('/{record}/edit'),
+        ];
+    }
+
+    public static function provinsi($id): string
     {
         return Cache::remember("province_{$id}", now()->addHours(24), function () use ($id) {
             try {
@@ -269,7 +218,7 @@ class ProfileCompany extends Page implements HasForms, HasInfolists
             }
         });
     }
-    public function kabupaten($id): string
+    public static function kabupaten($id): string
     {
         return Cache::remember("kabupaten_{$id}", now()->addHours(24), function () use ($id) {
             try {
@@ -282,7 +231,7 @@ class ProfileCompany extends Page implements HasForms, HasInfolists
             }
         });
     }
-    public function kecamatan($id): string
+    public  static  function kecamatan($id): string
     {
         return Cache::remember("kecamatan_{$id}", now()->addHours(24), function () use ($id) {
             try {
@@ -295,7 +244,7 @@ class ProfileCompany extends Page implements HasForms, HasInfolists
             }
         });
     }
-    public function getProvinsi()
+    public static  function getProvinsi()
     {
 
 
@@ -310,7 +259,7 @@ class ProfileCompany extends Page implements HasForms, HasInfolists
             }
         });
     }
-    public function getKabupaten($id)
+    public static function getKabupaten($id)
     {
         return Cache::remember("kabupaten_all_{$id}", now()->addHours(24), function () use ($id) {
             try {
@@ -323,7 +272,7 @@ class ProfileCompany extends Page implements HasForms, HasInfolists
             }
         });
     }
-    public function getKecamatan($id)
+    public static function getKecamatan($id)
     {
         return Cache::remember("kecamatan_all_{$id}", now()->addHours(24), function () use ($id) {
             try {
@@ -335,29 +284,5 @@ class ProfileCompany extends Page implements HasForms, HasInfolists
                 return [];
             }
         });
-    }
-
-
-    public function create()
-    {
-
-        $data = $this->form->getState();
-
-        $data['user_id'] = auth()->user()->id;
-
-        ModelsProfileCompany::create($data);
-
-        return redirect(static::getUrl());
-    }
-    public function edit()
-    {
-
-        $data = $this->form->getState();
-        unset($data['location']);
-        $id = auth()->user()->kua()->first()->id;
-
-        ModelsProfileCompany::where('id', $id)->update($data);
-
-        return redirect(static::getUrl());
     }
 }
