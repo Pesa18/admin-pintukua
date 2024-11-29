@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Article extends Model
 {
+
+
     use HasFactory, HasUuids;
     protected $guarded = ['id'];
     protected $primaryKey = 'uuid';
@@ -53,8 +55,8 @@ class Article extends Model
     {
         return $this->belongsTo(User::class)->withoutGlobalScopes();
     }
-    public function kua()
+    public function kua(): BelongsToMany
     {
-        return $this->hasMany(KuaTeam::class, 'user_id', 'user_id');
+        return $this->belongsToMany(ProfileCompany::class, 'kua_user', 'user_id', 'id_kua', 'user_id', 'id_kua');
     }
 }

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ProfileCompany extends Model
 {
@@ -12,8 +12,11 @@ class ProfileCompany extends Model
 
 
     protected $guarded = ['id'];
-    public function kepala(): BelongsTo
+
+
+    public function kepala(): HasMany
     {
-        return $this->belongsTo(Employee::class);
+        return $this->hasMany(Employee::class, 'id_kua', 'id_kua')
+            ->where('is_kepala', true);
     }
 }

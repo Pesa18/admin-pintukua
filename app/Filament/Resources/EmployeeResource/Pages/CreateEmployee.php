@@ -11,7 +11,10 @@ class CreateEmployee extends CreateRecord
     protected static string $resource = EmployeeResource::class;
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['id_kua'] = auth()->user()->kua()->first()->id_kua;
+        $id_kua = auth()->user()->kua()->first()->id_kua;
+        if ($id_kua) {
+            $data['id_kua'] = $id_kua;
+        }
         return $data;
     }
 }

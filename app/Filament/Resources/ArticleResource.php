@@ -10,9 +10,11 @@ use Filament\Forms\Form;
 use Illuminate\View\View;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
+use Filament\Facades\Filament;
 use Illuminate\Support\Carbon;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
+use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
@@ -23,13 +25,13 @@ use Filament\Forms\Components\ViewField;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\MarkdownEditor;
 use App\Filament\Resources\ArticleResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ArticleResource\RelationManagers;
-use Filament\Facades\Filament;
 
 class ArticleResource extends Resource
 {
@@ -42,18 +44,18 @@ class ArticleResource extends Resource
     {
         $id_kua = auth()->user()->kua()->first()?->id_kua;
 
-        if (auth()->user()->isSuperAdmin()) {
+        if (auth()->user()->isSuperAdmin() || auth()->user()->isEditor() || auth()->user()->isAdmin()) {
             return parent::getEloquentQuery()->withoutGlobalScopes();
         }
 
         return parent::getEloquentQuery()->whereHas('kua', function ($query) use ($id_kua) {
-            $query->where('id_kua', $id_kua);
+            $query->where('kua_user.id_kua', $id_kua);
         });
     }
 
     public static function isScopedToTenant(): bool
     {
-        if (auth()->user()->isSuperAdmin()) {
+        if (auth()->user()->isSuperAdmin() || auth()->user()->isEditor() || auth()->user()->isAdmin()) {
             return false;
         }
         return true;
@@ -101,15 +103,16 @@ class ArticleResource extends Resource
 
                         // Only render the tooltip if the column content exceeds the length limit.
                         return $state;
-                    }),
+                    })->searchable(),
                 TextColumn::make('status')->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'draft' => 'gray',
                         'published' => 'success',
                     }),
                 TextColumn::make('published_at')->default('-'),
-                TextColumn::make('user.name'),
+                TextColumn::make('user.name')->searchable(),
                 TextColumn::make('team.name'),
+                TextColumn::make('kua.name')->label('KUA')->default('Bukan User KUA'),
                 TextColumn::make('viewers')->state(function ($record) {
                     return  Article::withoutGlobalScopes()->withCount('viewers')->find($record->uuid)?->viewers_count;
                 }),
@@ -117,7 +120,11 @@ class ArticleResource extends Resource
 
             ])
             ->filters([
-                //
+                Filter::make('is_published')
+                    ->query(fn(Builder $query): Builder => $query->whereNot('published_at', true, null))->toggle(),
+                SelectFilter::make('KUA')
+                    ->relationship('kua', 'name')
+                    ->searchable()->visible(auth()->user()->isSuperAdmin() || auth()->user()->isEditor() || auth()->user()->isAdmin())
             ])
             ->modifyQueryUsing(function (Builder $query) {
                 // $query->where('team_id', getPermissionsTeamId());
@@ -129,12 +136,12 @@ class ArticleResource extends Resource
                     ->button()->hidden(fn(Article $record) => $record->published_at)
                     ->icon('heroicon-o-arrow-path')
                     ->requiresConfirmation()->modalIcon('heroicon-o-arrow-path')
-                    ->action(fn(Article $record) => $record->update(['published_at' => Carbon::now(), 'status' => 'published'])),
+                    ->action(fn(Article $record) => $record->update(['published_at' => Carbon::now(), 'status' => 'published']))->visible(auth()->user()->isSuperAdmin() || auth()->user()->isEditor() || auth()->user()->isAdmin()),
                 Tables\Actions\Action::make('Draft')->label("Draft")
                     ->button()->hidden(fn(Article $record) => !$record->published_at)
                     ->icon('heroicon-o-arrow-path')
                     ->requiresConfirmation()->modalIcon('heroicon-o-arrow-path')
-                    ->action(fn(Article $record) => $record->update(['published_at' => null, 'status' => 'draft'])),
+                    ->action(fn(Article $record) => $record->update(['published_at' => null, 'status' => 'draft']))->visible(auth()->user()->isSuperAdmin() || auth()->user()->isEditor() || auth()->user()->isAdmin()),
                 Tables\Actions\Action::make('View')->modalContent(fn(Article $record): View => view(
                     'filament.pages.actions.view-article',
                     ['record' => $record],

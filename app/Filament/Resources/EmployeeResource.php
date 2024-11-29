@@ -3,18 +3,26 @@
 namespace App\Filament\Resources;
 
 use Filament\Forms;
+use App\Models\User;
 use Filament\Tables;
+use App\Models\KuaTeam;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use App\Models\Employee;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
+use Illuminate\Support\Facades\Hash;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Tables\Columns\ToggleColumn;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\EmployeeResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -24,8 +32,10 @@ use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 class EmployeeResource extends Resource
 {
     protected static ?string $model = Employee::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationLabel = 'Data Pegawai';
+    protected static ?string $label = 'Data Pegawai';
+    protected static ?string $pluralLabel = 'Data Pegawai';
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
     protected static ?string $tenantRelationshipName = 'employee';
     // protected static bool $isScopedToTenant = false;
 
@@ -118,14 +128,63 @@ class EmployeeResource extends Resource
     {
         return $table
             ->columns([
-                //
+                ImageColumn::make('avatar')->label('Foto')
+                    ->circular(),
+                TextColumn::make('name'),
+                ToggleColumn::make('is_kepala')->beforeStateUpdated(function ($record, $state) {
+                    // Runs before the state is saved to the database.
+
+                })
+                    ->afterStateUpdated(function ($record, $state) {
+                        if ($state) {
+                            $record::where('id_kua', $record->id_kua) // Filter sesuai id_kua jika ada
+                                ->where('id', '!=', $record->id)     // Kecualikan record yang sedang diubah
+                                ->update(['is_kepala' => false]);
+                        }
+                    }),
+                TextColumn::make('is_user.name')->action(Action::make('open')->modal())->badge()->default('Bukan User')
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('Jadikan User')->hidden(fn(): bool => !auth()->user()->isSuperAdmin())
+                Tables\Actions\EditAction::make()->button(),
+                Tables\Actions\Action::make('Jadikan User')
+                    ->action(function (array $data, User $user, KuaTeam $kua, Employee $record,) {
+                        if ($data) {
+                            $user_data = $user->create($data);
+                            if ($user_data) {
+                                $user_data->roles()->syncWithPivotValues($data['roles'], [config('permission.column_names.team_foreign_key') => getPermissionsTeamId()]);
+                                $kua->create([
+                                    'id_kua' => $record->id_kua,
+                                    'id_employee' => $record->id,
+                                    'user_id' => $user_data->id,
+                                ]);
+                            }
+                        }
+                    })
+                    ->form([
+                        TextInput::make('name'),
+                        TextInput::make('email'),
+                        TextInput::make('password')->dehydrateStateUsing(fn(string $state): string => Hash::make($state))
+                            ->dehydrated(fn(?string $state): bool => filled($state)),
+                        Select::make('roles')
+                            ->relationship('roles', 'name')
+                            ->multiple()
+                            ->preload()
+                            ->dehydrateStateUsing(fn($state) => $state)
+                            ->dehydrated(fn($state): bool => filled($state))
+                            ->searchable()
+                            ->model(User::class),
+                    ])->model(User::class)
+                    ->fillForm(fn(Employee $record): array => [
+                        'name' => $record->name,
+                        'email' => $record->email,
+                    ])
+                    ->hidden(fn(): bool => auth()->user()->isSuperAdmin())->visible(fn(Model $record): bool => !$record->is_user()->exists())
+                    ->button()->color('warning')->closeModalByClickingAway(false)
+
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

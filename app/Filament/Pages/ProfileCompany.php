@@ -16,17 +16,18 @@ use Filament\Forms\Components\Select;
 use Illuminate\Support\Facades\Cache;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Infolists\Components\Grid;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\Rules\Unique;
 use Filament\Forms\Components\TextInput;
 use Dotswan\MapPicker\Infolists\MapEntry;
 use Filament\Forms\Components\FileUpload;
 use Stevebauman\Location\Facades\Location;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Contracts\HasInfolists;
 use Filament\Forms\Concerns\InteractsWithForms;
 use App\Models\ProfileCompany as ModelsProfileCompany;
-use Filament\Infolists\Components\Grid;
-use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Concerns\InteractsWithInfolists;
 use Filament\Infolists\Components\Section as ComponentsSection;
 
@@ -208,7 +209,7 @@ class ProfileCompany extends Page implements HasForms, HasInfolists
     {
         if ($this->getViewData()['data']) {
             return $infolist
-                ->record(auth()->user()->kua()->first())
+                ->record(auth()->user()->kua()->with('kepala')->first())
                 ->state($this->getViewData()['data']->toArray())
                 ->schema([
                     Grid::make()->schema([
@@ -216,6 +217,7 @@ class ProfileCompany extends Page implements HasForms, HasInfolists
                             TextEntry::make('name'),
                             TextEntry::make('id_kua'),
                             TextEntry::make('address'),
+                            TextEntry::make('kepala')->state(fn(Model $record) => $record->kepala->first()?->name)->default('Belum Diatur'),
                             TextEntry::make('id_provinsi')->formatStateUsing(fn(string $state): string => $this->provinsi($state))->label('Provinsi'),
                             TextEntry::make('id_kabupaten')->formatStateUsing(fn(string $state): string => $this->kabupaten($state))->label('Kabupaten'),
                             TextEntry::make('id_kecamatan')->formatStateUsing(fn(string $state): string => $this->kecamatan($state))->label('Kecamatan'),

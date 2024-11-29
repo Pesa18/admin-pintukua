@@ -50,8 +50,14 @@ class AppbannerResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('title'),
-                TextColumn::make('is_active')->badge()->color(fn(string $state): string => match ($state) {
-                    '1' => 'success'
+                TextColumn::make('is_active')->badge()->state(function ($record) {
+                    if ($record->is_active) {
+                        return "Aktif";
+                    }
+                    return "Tidak Aktif";
+                })->color(fn(string $state): string => match ($state) {
+                    'Aktif' => 'success',
+                    'Tidak Aktif' => 'danger'
                 })
 
             ])

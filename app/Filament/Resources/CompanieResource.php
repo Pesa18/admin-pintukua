@@ -31,13 +31,16 @@ use App\Filament\Resources\CompanieResource\RelationManagers;
 use App\Filament\Resources\CompanieResource\Pages\EditCompanie;
 use App\Filament\Resources\CompanieResource\Pages\ListCompanies;
 use App\Filament\Resources\CompanieResource\Pages\CreateCompanie;
+use Filament\Tables\Columns\TextColumn;
 
 class CompanieResource extends Resource
 {
     protected static ?string $model = ProfileCompany::class;
     protected static bool $isScopedToTenant = false;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationLabel = 'Data KUA';
+    protected static ?string $label = 'Data KUA';
+    protected static ?string $pluralLabel = 'Data KUA';
+    protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
 
 
     public static function getDefaultLocation()
@@ -174,13 +177,16 @@ class CompanieResource extends Resource
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('name')->label('Nama KUA'),
+                TextColumn::make('id_kua')->label('Kode KUA'),
+                TextColumn::make('contact')->label('Telepon'),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()->button(),
+                Tables\Actions\DeleteAction::make()->button(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

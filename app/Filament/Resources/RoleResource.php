@@ -18,6 +18,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class RoleResource extends ResourcesRoleResource
 {
 
+
+
     // protected static $relations;
 
     // // protected static ?array $getRelations = [];

@@ -91,4 +91,9 @@ class User extends Authenticatable implements HasTenants
             // dd(auth()->check());
         });
     }
+    public function kepalaEmployees()
+    {
+        return $this->hasMany(Employee::class, 'id_kua', 'id_kua')
+            ->where('is_kepala', true);
+    }
 }

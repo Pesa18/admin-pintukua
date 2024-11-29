@@ -11,7 +11,7 @@ return [
 
     'preload_permissions' => true,
 
-    'navigation_section_group' => 'filament-spatie-roles-permissions::filament-spatie.section.roles_and_permissions', // Default uses language constant
+    'navigation_section_group' => 'Roles', // Default uses language constant
 
     'team_model' => \App\Models\Team::class,
 
@@ -21,7 +21,7 @@ return [
      * Set as false to remove from navigation.
      */
     'should_register_on_navigation' => [
-        'permissions' => true,
+        'permissions' => false,
         'roles' => true,
     ],
 
@@ -68,7 +68,6 @@ return [
 
     'guard_names' => [
         'web' => 'web',
-        'api' => 'api',
     ],
 
     'toggleable_guard_names' => [
@@ -83,7 +82,7 @@ return [
     'default_guard_name' => null,
 
     // if false guard option will not be show on screen. You should set a default_guard_name in this case
-    'should_show_guard' => true,
+    'should_show_guard' => false,
 
     'model_filter_key' => 'return \'%\'.$value;', // Eg: 'return \'%\'.$key.'\%\';'
 
@@ -110,7 +109,6 @@ return [
 
         'guard_names' => [
             'web',
-            'api',
         ],
 
         'permission_affixes' => [
