@@ -48,6 +48,7 @@ class AppServiceProvider extends ServiceProvider
         // Gate::policy(Permission::class, PermissionPolicy::class);
         FilamentAsset::register([
             Css::make('ckeditor', 'https://cdn.ckeditor.com/ckeditor5/43.1.0/ckeditor5.css'),
+
         ]);
     }
 }
