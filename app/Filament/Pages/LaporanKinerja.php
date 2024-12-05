@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Models\Employee;
 use Carbon\Carbon;
 use Filament\Forms\Form;
 use Filament\Pages\Page;
@@ -40,12 +41,28 @@ class LaporanKinerja extends Page implements HasForms
         ];
     }
 
-    public function cetakPdf($date)
+    public function cetakPdf(Request $request)
     {
-        $data = ['tanggal' => $date];
-        $pdf = Pdf::loadView('pdf.laporan_kinerja', $data)->setOption('isHtml5ParserEnabled', true);;
+
+        $bulan = Carbon::parse($request->input('tanggal'))->format('m');
+        $tahun = Carbon::parse($request->input('tanggal'))->format('Y');
+        $query = ModelsLaporanKinerja::whereMonth('tanggal', $bulan)
+            ->whereYear('tanggal', $tahun)
+            ->where('user_id', auth()->user()->id)->orderBy('tanggal', 'ASC')->get();
+        $data = [
+            'query' => $query,
+            'data_pegawai' => auth()->user()->is_pegawai()?->first(),
+            'data_kua' => auth()->user()->kua()->first(),
+            'kepala' => Employee::where('is_kepala', true)->where('id_kua', auth()->user()->kua()->first()?->id_kua)->first()
+        ];
+        $pdf = Pdf::loadView('pdf.laporan_kinerja', $data);
 
         return $pdf->stream('example.pdf');
+        // return response()->streamDownload(
+        //     fn() => print($pdf->stream()),
+        //     'laporan.pdf',
+        //     ['Content-Type' => 'application/pdf']
+        // );
     }
 
     public function form(Form $form): Form

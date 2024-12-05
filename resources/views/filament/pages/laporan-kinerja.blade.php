@@ -60,8 +60,8 @@
 
                 console.log(info);
                 console.log('End Date:', endDate);
-                const button = document.getElementById('cetak-pdf');
-                button.setAttribute('wire:click', `cetakPdf('${new Date(startDate).toISOString().split('T')[0]}')`);
+                const inputTanggal = document.getElementById('data-tanggal');
+                inputTanggal.value = new Date( endDate).toISOString().split('T')[0]
 
                 // Kirim data ke server atau gunakan sesuai kebutuhan
             },
@@ -101,27 +101,7 @@
 
     
 
-    function cetakPdf($tgl){
-      fetch('{{ route('api.data') }}')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json(); // Mengonversi response ke JSON
-                })
-                .then(data => {
-                    // Menampilkan data di halaman
-                    dataContainer.innerHTML = `
-                        <h3>Message: ${data.message}</h3>
-                        <ul>
-                            ${data.data.map(item => `<li>${item}</li>`).join('')}
-                        </ul>
-                    `;
-                })
-                .catch(error => {
-                    console.error('There was a problem with the fetch operation:', error);
-                });
-    }
+    
   })
 
  

@@ -127,9 +127,9 @@ class ArticleResource extends Resource
                     ->searchable()->visible(auth()->user()->isSuperAdmin() || auth()->user()->isEditor() || auth()->user()->isAdmin())
             ])
             ->modifyQueryUsing(function (Builder $query) {
-                // $query->where('team_id', getPermissionsTeamId());
-
-                // dd(getPermissionsTeamId());
+                if (auth()->user()->hasRole('Kontributor-KUA')) {
+                    $query->where('user_id', auth()->user()->id);
+                }
             })
             ->actions([
                 Tables\Actions\Action::make('Publish')->label("Publish")

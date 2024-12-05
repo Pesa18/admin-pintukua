@@ -12,4 +12,5 @@ Route::get('/', function () {
 Route::post('/imageeditor', [UploadImageEditor::class, 'upload'])->name('upload.image.editor');
 
 Route::post('/getlaporan', [LaporanKinerja::class, 'getall'])->name('laporan.kinerja');
+Route::post('/cetakpdf', [LaporanKinerja::class, 'cetakPdf'])->name('cetak.laporan');
 Route::resource('user', ApiArticle::class);
