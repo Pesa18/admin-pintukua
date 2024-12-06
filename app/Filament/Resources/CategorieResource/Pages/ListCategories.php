@@ -20,13 +20,13 @@ class ListCategories extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\Action::make('New Categorie')->form([
+            Actions\Action::make('Buat Kategori')->form([
                 Repeater::make('categories')
                     ->schema([
                         TextInput::make('name')->required()->live(debounce: 700)->afterStateUpdated(fn(Set $set, ?string $state) => $set('slug', Str::slug($state))),
                         TextInput::make('slug')->required()->readOnly(),
                     ])
-                    ->columns(2)->addActionLabel('Add Categorie')
+                    ->columns(2)->addActionLabel('Tambah Kategori')
             ])->action(function (array $data): void {
                 try {
                     Categorie::insert($data['categories']);

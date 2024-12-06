@@ -9,7 +9,8 @@
       "@fullcalendar/core": "https://cdn.skypack.dev/@fullcalendar/core@6.1.15",
       "@fullcalendar/core/locales/id": "https://cdn.skypack.dev/@fullcalendar/core@6.1.15/locales/id",
       "@fullcalendar/daygrid": "https://cdn.skypack.dev/@fullcalendar/daygrid@6.1.15",
-      "@fullcalendar/interaction": "https://cdn.skypack.dev/@fullcalendar/interaction@6.1.15"
+      "@fullcalendar/interaction": "https://cdn.skypack.dev/@fullcalendar/interaction@6.1.15",
+      "@fullcalendar/google-calendar": "https://cdn.skypack.dev/@fullcalendar/google-calendar@6.1.15"
     }
   }
 </script>
@@ -18,13 +19,19 @@
   import dayGridPlugin from '@fullcalendar/daygrid'
   import interactionPlugin from '@fullcalendar/interaction'
   import idLocale from '@fullcalendar/core/locales/id'
+  import googleCalendar from '@fullcalendar/google-calendar'
 
   document.addEventListener('DOMContentLoaded', function() {
     const calendarEl = document.getElementById('calendar')
     const calendar = new Calendar(calendarEl, {
-      plugins: [dayGridPlugin,interactionPlugin],
+      plugins: [dayGridPlugin,interactionPlugin,googleCalendar],
       initialDate: '{{ request()->get("date")?? \Carbon\Carbon::now('UTC')->toDateString() }}',
       showNonCurrentDates:false,
+      googleCalendarApiKey: "AIzaSyCtLMN4rz-64zhoCceBplnBrKeKJRlTVl0",
+      events: {
+    googleCalendarId: 'id.indonesian#holiday@group.v.calendar.google.com',
+    color: "red",
+  },
       headerToolbar: {
         left: 'prev,next today',
         center: 'title',
@@ -33,10 +40,7 @@
       selectable:true,
        locales: [ idLocale ],
   locale: 'id',
-  events: [{
-        title: "Laporan",
-        start: new Date(),
-      }, ],
+ 
   eventClick: function (info) {
     let form = document.getElementById('form-edit')
       form.reset()
@@ -86,11 +90,7 @@
         },
           color: "yellow",
           format: "json",
-        },
-        // {
-        //   googleCalendarId: "id.indonesian#holiday@group.v.calendar.google.com",
-        //   className: "bg-danger",
-        // },
+        }
         // {
         //   url: "/dashboard/getCalendarAll",
         //   method: "POST",
@@ -134,11 +134,23 @@
 <x-filament-panels::form wire:submit="update" id="form-edit">
   {{ $this->form }}
 
-  <x-filament::button
- type="submit"
->
-  Edit
-</x-filament::button>
+
+  <div class="flex flex-row gap-2">
+
+    <x-filament::button
+    type="submit"
+   >
+     Edit
+   </x-filament::button>
+    <x-filament::button
+    wire:click="delete"
+    color="danger"
+   >
+     Hapus
+   </x-filament::button>
+
+  </div>
+ 
 </x-filament-panels::form>
 </x-filament::modal>
 

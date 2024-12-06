@@ -19,7 +19,9 @@ use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
 use App\Forms\Components\ContentEditor;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ViewField;
 use Filament\Tables\Columns\ImageColumn;
@@ -28,6 +30,7 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\CheckboxList;
+use Illuminate\Database\Eloquent\Collection;
 use Filament\Forms\Components\MarkdownEditor;
 use App\Filament\Resources\ArticleResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -36,6 +39,9 @@ use App\Filament\Resources\ArticleResource\RelationManagers;
 class ArticleResource extends Resource
 {
     protected static ?string $model = Article::class;
+    protected static ?string $navigationLabel = 'Artikel & Berita';
+    protected static ?string $label = 'Artikel & Berita';
+    protected static ?string $pluralLabel = 'Artikel & Berita';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $tenantRelationshipName = 'articleTeams';
@@ -110,13 +116,13 @@ class ArticleResource extends Resource
                         'published' => 'success',
                     }),
                 TextColumn::make('published_at')->default('-'),
-                TextColumn::make('user.name')->searchable(),
-                TextColumn::make('team.name'),
+                TextColumn::make('user.name')->searchable()->label('Author'),
+                // TextColumn::make('team.name'),
                 TextColumn::make('kua.name')->label('KUA')->default('Bukan User KUA'),
                 TextColumn::make('viewers')->state(function ($record) {
                     return  Article::withoutGlobalScopes()->withCount('viewers')->find($record->uuid)?->viewers_count;
                 }),
-                ImageColumn::make('image'),
+                // ImageColumn::make('image'),
 
             ])
             ->filters([
@@ -151,7 +157,18 @@ class ArticleResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+
                 ]),
+                BulkAction::make('Publish')->button()->action(
+                    function (Collection $records) {
+                        $records->each(
+                            fn(Model $selectedRecord) => $selectedRecord->update([
+                                'status' => 'published',
+                                'published_at' =>  Carbon::now(),
+                            ]),
+                        );
+                    }
+                )->visible(auth()->user()->isSuperAdmin() || auth()->user()->isEditor() || auth()->user()->isAdmin()),
             ]);
     }
 

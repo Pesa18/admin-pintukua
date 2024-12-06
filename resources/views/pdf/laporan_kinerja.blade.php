@@ -67,7 +67,7 @@
             <td>: {{ $data_pegawai?->position }}</td>
         </tr>
         <tr>
-            <td><strong>Pangkat</strong></td>
+            <td><strong>Status</strong></td>
             <td>: {{ $data_pegawai?->status }}</td>
         </tr>
         <tr>
@@ -93,7 +93,7 @@
             @foreach ($query as $item)
             <tr>
                 <td>{{ $loop->iteration }}</td>
-                <td>{{ $item?->kegiatan }}h</td>
+                <td>{{ $item?->kegiatan }}</td>
                 <td>{{ $item?->deskripsi_pekerjaan}}</td>
                 <td>{{ $item?->tanggal }}</td>
             </tr>
@@ -114,13 +114,13 @@
                 NIP. {{ $kepala?->nip }}
             </td>
             <td style="text-align: right;">
-                Kuningan, 30 Juni 2024<br>
+                Kuningan, {{ \Carbon\Carbon::create($titimangsa)->translatedFormat('d F Y') }}<br>
                 Penyusun<br><br>
                 <br>
                 <br>
                 <br>
-                <strong>Asep Saefudin Al'amin</strong><br>
-                NIP. 199409182023211010
+                <strong>{{ $data_pegawai?->name }}</strong><br>
+                NIP. {{ $data_pegawai?->nip }}
             </td>
         </tr>
     </table>

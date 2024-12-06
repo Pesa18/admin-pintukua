@@ -36,7 +36,9 @@ class ProfileCompany extends Page implements HasForms, HasInfolists
     use InteractsWithForms;
     use InteractsWithInfolists;
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
-
+    protected static ?string $navigationLabel = 'Profil KUA';
+    protected static ?string $label = 'Profil KUA';
+    protected static ?string $pluralLabel = 'Profil KUA';
     protected static string $view = 'filament.pages.profile-company';
     public  $location = null;
     public ?string $id_provinsi = null;

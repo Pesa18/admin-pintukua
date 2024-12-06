@@ -20,7 +20,9 @@ use Filament\Tables\Columns\TextColumn;
 class TagResource extends Resource
 {
     protected static ?string $model = Tag::class;
-
+    protected static ?string $navigationLabel = 'Tag Berita';
+    protected static ?string $label = 'Tag Berita';
+    protected static ?string $pluralLabel = 'Tag Berita';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static bool $isScopedToTenant = false;
     public static function form(Form $form): Form

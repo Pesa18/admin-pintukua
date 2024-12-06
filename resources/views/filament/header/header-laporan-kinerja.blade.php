@@ -1,11 +1,11 @@
 <div class="text-xl font-bold">
     Laporan Kinerja
 </div>
-<form action="{{ route('cetak.laporan') }}" method="post" onsubmit="target_popup(this)" class="flex flex-col">
+<form action="{{ route('cetak.laporan') }}" method="post" onsubmit="target_popup(this)" class="flex flex-row justify-end">
     @csrf
-    <input type="text" id="data-tanggal"  name="tanggal">
-    <x-filament::button id="cetak-pdf" type="submit">
-    Cetak
+    <input type="text" id="data-tanggal" hidden name="tanggal">
+    <x-filament::button id="cetak-pdf" type="submit" icon="heroicon-m-printer">
+    Cetak Laporan
 </x-filament::button>
 </form>
 

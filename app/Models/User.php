@@ -19,12 +19,14 @@ use Illuminate\Database\Eloquent\Builder;
 use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
+use Filament\Models\Contracts\HasAvatar;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
 
-class User extends Authenticatable implements HasTenants
+class User extends Authenticatable implements HasTenants, HasAvatar
 {
     use HasFactory, Notifiable, HasRoles, HasSuperAdmin, HasUserkua;
 
@@ -61,7 +63,13 @@ class User extends Authenticatable implements HasTenants
             'password' => 'hashed',
         ];
     }
-
+    public function getFilamentAvatarUrl(): ?string
+    {
+        if ($this->is_pegawai()->first()?->avatar) {
+            return asset($this->is_pegawai()->first()?->avatar);
+        };
+        return null;
+    }
     public function teams(): BelongsToMany
     {
         return $this->belongsToMany(Team::class);

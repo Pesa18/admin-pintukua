@@ -1,6 +1,6 @@
 
 <div class="container text-center mx-auto">
-    <img src="{{ Storage::url( $record->image)  }}" alt="" class="w-20 h-20 mx-auto">
+    <img src="{{ asset( $record->image)  }}" alt="" class="w-full">
 </div>
 
 <div class="font-bold text-2xl ">

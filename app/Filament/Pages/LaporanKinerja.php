@@ -26,6 +26,12 @@ class LaporanKinerja extends Page implements HasForms
     ];
     public ?string $deskripsi_pekerjaan = null;
 
+    public static function canAccess(): bool
+    {
+
+        return auth()->user()->is_pegawai()->first()?->status === 'PPPK';
+    }
+
     public function getHeader(): ?View
     {
         return View('filament.header.header-laporan-kinerja');
@@ -53,7 +59,8 @@ class LaporanKinerja extends Page implements HasForms
             'query' => $query,
             'data_pegawai' => auth()->user()->is_pegawai()?->first(),
             'data_kua' => auth()->user()->kua()->first(),
-            'kepala' => Employee::where('is_kepala', true)->where('id_kua', auth()->user()->kua()->first()?->id_kua)->first()
+            'kepala' => Employee::where('is_kepala', true)->where('id_kua', auth()->user()->kua()->first()?->id_kua)->first(),
+            'titimangsa' => $request->input('tanggal')
         ];
         $pdf = Pdf::loadView('pdf.laporan_kinerja', $data);
 
@@ -70,8 +77,12 @@ class LaporanKinerja extends Page implements HasForms
         return $form->schema([
             Hidden::make('id')->id('id-kinerja'),
             Hidden::make('tanggal')->id('tanggal-kinerja'),
-            TextInput::make('kegiatan')->id('id-kegiatan'),
-            Textarea::make('deskripsi_pekerjaan')->id('id-deskripsi')->label('deskripsi')
+            TextInput::make('kegiatan')->required()->id('id-kegiatan')->label('Judul Kegiatan')->rules('required')->markAsRequired(true)->validationMessages([
+                'required' => 'Judul Kegiatan Harus diisi!',
+            ]),
+            Textarea::make('deskripsi_pekerjaan')->required()->id('id-deskripsi')->label('Pekerjaan')->rules('required')->markAsRequired(true)->validationMessages([
+                'required' => 'Pekerjaan Harus diisi!',
+            ])
         ])->statePath('dataForm');
     }
 
@@ -92,6 +103,14 @@ class LaporanKinerja extends Page implements HasForms
 
         $data = $this->form->getState();
         ModelsLaporanKinerja::where('id', $data['id'])->update($data);
+        $this->form->fill();
+
+        return redirect(static::getUrl() . '?date=' . $data['tanggal']);
+    }
+    public function delete()
+    {
+        $data = $this->form->getState();
+        ModelsLaporanKinerja::where('id', $data['id'])->delete();
         $this->form->fill();
 
         return redirect(static::getUrl() . '?date=' . $data['tanggal']);

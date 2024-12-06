@@ -68,21 +68,14 @@ class UserAdminResource extends Resource
                 TextColumn::make('name'),
                 TextColumn::make('roles.name'),
                 TextColumn::make('email'),
-                TextColumn::make('kua.id_kua')->default('Bukan User KUA')
+                TextColumn::make('kua.name')->default('Bukan User KUA')
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('id_kua')->form([
-                    TextInput::make('id_kua')
-                ])->action(function (array $data,  $record): void {
-                    KuaTeam::create([
-                        'id_kua' => $data['id_kua'],
-                        'user_id' => $record->id,
-                    ]);
-                })
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

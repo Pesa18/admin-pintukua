@@ -20,13 +20,13 @@ class ListTags extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\Action::make('New Tags')->form([
+            Actions\Action::make('Buat Tag')->form([
                 Repeater::make('tags')
                     ->schema([
                         TextInput::make('name')->required()->live(debounce: 700)->afterStateUpdated(fn(Set $set, ?string $state) => $set('slug', Str::slug($state))),
                         TextInput::make('slug')->required()->readOnly(),
                     ])
-                    ->columns(2)->addActionLabel('Add Tags')
+                    ->columns(2)->addActionLabel('Tambah Tag')
             ])->action(function (array $data): void {
                 try {
                     Tag::insert($data['tags']);

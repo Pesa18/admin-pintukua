@@ -20,7 +20,9 @@ use Filament\Tables\Columns\TextColumn;
 class CategorieResource extends Resource
 {
     protected static ?string $model = Categorie::class;
-
+    protected static ?string $navigationLabel = 'Kategori Berita';
+    protected static ?string $label = 'Kategori Berita';
+    protected static ?string $pluralLabel = 'Kategori Berita';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static bool $isScopedToTenant = false;
 
