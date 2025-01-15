@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('kua_user', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_kua')->nullable()->constrained('profile_companies', 'id_kua')->onDelete('set null'); // Foreign key ke kuas
+            $table->foreignId('id_kua')->nullable()->constrained('profile_companies', 'id_kua')->onDelete('set null')->onUpdate("cascade"); // Foreign key ke kuas
             $table->foreignId('id_employee')->nullable()->constrained('employees')->onDelete('set null'); // Foreign key ke kuas
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // Foreign key ke users
             $table->timestamps(); // created_at dan updated_at

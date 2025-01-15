@@ -4,12 +4,14 @@ namespace App\Providers;
 
 use App\Models\Team;
 use App\Models\User;
+use App\Models\Article;
 use App\Policies\RolePolicy;
 use App\Policies\TeamPolicy;
 use Filament\Facades\Filament;
 use App\Observers\UserObserver;
 use Filament\Support\Assets\Js;
 use Filament\Support\Assets\Css;
+use App\Observers\ArticleObserver;
 use App\Policies\PermissionPolicy;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Auth;
@@ -33,6 +35,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+
+        Article::observe(ArticleObserver::class);
 
         User::observe(UserObserver::class);
         Gate::before(function (User $user, string $ability) {

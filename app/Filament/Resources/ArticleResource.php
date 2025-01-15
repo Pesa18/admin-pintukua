@@ -35,6 +35,7 @@ use Filament\Forms\Components\MarkdownEditor;
 use App\Filament\Resources\ArticleResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ArticleResource\RelationManagers;
+use Filament\Forms\Components\Textarea;
 
 class ArticleResource extends Resource
 {
@@ -74,7 +75,8 @@ class ArticleResource extends Resource
                     Section::make('Artikel')->columns(2)->schema([
                         TextInput::make('title')->live(debounce: 700)->afterStateUpdated(fn(Set $set, ?string $state) => $set('slug', Str::slug($state)))->required(),
                         TextInput::make('slug')->required()->readOnly(),
-                        ContentEditor::make(name: 'content')->label('content')->id(1)->columnSpanFull()->required()
+                        Textarea::make('description')->required(),
+                        ContentEditor::make(name: 'content')->label('content')->id(1)->columnSpanFull()->required(),
                     ]),
                 ])->columns(2)->columnSpan(2),
                 Group::make()->schema([

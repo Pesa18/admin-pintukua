@@ -44,7 +44,7 @@ class AdminPanelProvider extends PanelProvider
             ->profile(EditProfile::class)
             ->tenant(Team::class)
             ->brandName('Pintu KUA')
-            ->brandLogo(asset('images/Pintu-KUA Logo.png'))
+            ->brandLogo(fn() => view('filament.brandlogo'))
             ->favicon(asset('images/Pintu-KUA Logo.png'))
             ->tenantRegistration(RegisterTeam::class)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')

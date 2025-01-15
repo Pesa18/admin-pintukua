@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('grade')->nullable(); // golongan pegawai
             $table->string('position')->nullable(); // Jabatan pegawai
             $table->string('nip')->unique()->nullable(); // NIP untuk ASN (opsional untuk non-ASN)
-            $table->foreignId('id_kua')->nullable()->constrained('profile_companies', 'id_kua')->onDelete('set null'); // Unit kerja pegawai
+            $table->foreignId('id_kua')->nullable()->constrained('profile_companies', 'id_kua')->onDelete('set null')->onUpdate("cascade"); // Unit kerja pegawai
             $table->date('date_of_birth'); // Tanggal lahir pegawai
             $table->date('date_of_joining'); // Tanggal bergabung dengan organisasi
             $table->string('gender')->nullable(); // Jenis kelamin pegawai

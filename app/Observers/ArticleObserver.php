@@ -11,6 +11,7 @@ class ArticleObserver
      */
     public function created(Article $article): void
     {
+
         if (auth()->hasUser()) {
             $article->team_id = auth()->user()->team_id;
             // or with a `team` relationship defined:

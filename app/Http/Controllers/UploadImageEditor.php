@@ -22,7 +22,7 @@ class UploadImageEditor extends Controller
             // Kirim respon ke CKEditor
             $url = Storage::url($path);
             return response()->json([
-                'url' => $url
+                'url' => url($url)
             ]);
         }
 

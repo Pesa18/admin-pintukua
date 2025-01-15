@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('laporan_kinerja', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('id_kua')->constrained('profile_companies', 'id_kua')->onDelete('set null');
+            $table->foreignId('id_kua')->constrained('profile_companies', 'id_kua')->onDelete('set null')->onUpdate("cascade");
             $table->string('kegiatan');
             $table->string('deskripsi_pekerjaan');
             $table->date('tanggal');
