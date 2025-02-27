@@ -34,11 +34,11 @@ class AppbannerResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('title'),
-                TextInput::make('description'),
-                TextInput::make('link'),
-                DateTimePicker::make('start_at'),
-                DateTimePicker::make('end_at'),
+                TextInput::make('title')->required(),
+                TextInput::make('description')->required(),
+                TextInput::make('link')->required(),
+                DateTimePicker::make('start_at')->required(),
+                DateTimePicker::make('end_at')->required(),
                 Checkbox::make('is_active'),
                 FileUpload::make('image_path')->image()
                     ->imageEditor()->image()->directory('banner-info')->required(),

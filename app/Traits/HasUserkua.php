@@ -13,14 +13,14 @@ trait HasUserkua
     use HasRoles;
     public function isUserkua()
     {
-        if (Filament::getTenant()?->id == 3 && $this->hasRole('Admin-KUA')) {
+        if (Filament::getTenant()?->id == config('kua.tenant_kua.id') && $this->hasRole(config('kua.admin_kua_role'))) {
             return true;
         }
         return false;
     }
     public function isTeamkua()
     {
-        if (Filament::getTenant()->id == 3) {
+        if (Filament::getTenant()->id == config('kua.tenant_kua.id')) {
             return true;
         }
         return false;
@@ -33,11 +33,11 @@ trait HasUserkua
 
     public function isAdmin(): bool
     {
-        return $this->hasRole('Admin');
+        return $this->hasRole(config('kua.admin_role'));
     }
     public function isEditor(): bool
     {
-        return $this->hasRole('Editor');
+        return $this->hasRole(config('kua.editor_role'));
     }
     public function is_pegawai(): BelongsToMany
     {
