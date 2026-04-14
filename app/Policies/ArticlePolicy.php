@@ -13,7 +13,7 @@ class ArticlePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->checkPermissionTo('view-any Article');
+        return $user->checkPermissionTo('lihat-semua Article');
     }
 
     /**
@@ -21,7 +21,7 @@ class ArticlePolicy
      */
     public function view(User $user, Article $article): bool
     {
-        return $user->checkPermissionTo('view Article');
+        return $user->checkPermissionTo('lihat Article');
     }
 
     /**

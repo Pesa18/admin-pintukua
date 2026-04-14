@@ -13,7 +13,7 @@ class UserAccountsPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->checkPermissionTo('view-any UserAccounts');
+        return $user->checkPermissionTo('lihat-semua UserAccounts');
     }
 
     /**
@@ -21,7 +21,7 @@ class UserAccountsPolicy
      */
     public function view(User $user, UserAccounts $useraccounts): bool
     {
-        return $user->checkPermissionTo('view UserAccounts');
+        return $user->checkPermissionTo('lihat UserAccounts');
     }
 
     /**

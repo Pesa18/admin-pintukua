@@ -13,7 +13,7 @@ class EmployeePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->checkPermissionTo('view-any Employee');
+        return $user->checkPermissionTo('lihat-semua Employee');
     }
 
     /**
@@ -21,7 +21,7 @@ class EmployeePolicy
      */
     public function view(User $user, Employee $employee): bool
     {
-        return $user->checkPermissionTo('view Employee');
+        return $user->checkPermissionTo('lihat Employee');
     }
 
     /**

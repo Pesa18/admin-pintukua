@@ -13,7 +13,7 @@ class CategoriePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->checkPermissionTo('view-any Categorie');
+        return $user->checkPermissionTo('lihat-semua Categorie');
     }
 
     /**
@@ -21,7 +21,7 @@ class CategoriePolicy
      */
     public function view(User $user, Categorie $categorie): bool
     {
-        return $user->checkPermissionTo('view Categorie');
+        return $user->checkPermissionTo('lihat Categorie');
     }
 
     /**

@@ -48,8 +48,10 @@ return new class extends Migration
                 }
                 $table->dropPrimary();
 
-                $table->primary([$columnNames['team_foreign_key'], $pivotPermission, $columnNames['model_morph_key'], 'model_type'],
-                    'model_has_permissions_permission_model_type_primary');
+                $table->primary(
+                    [$columnNames['team_foreign_key'], $pivotPermission, $columnNames['model_morph_key'], 'model_type'],
+                    'model_has_permissions_permission_model_type_primary'
+                );
                 if (DB::getDriverName() !== 'sqlite') {
                     $table->foreign($pivotPermission)
                         ->references('id')->on($tableNames['permissions'])->onDelete('cascade');
@@ -67,8 +69,10 @@ return new class extends Migration
                 }
                 $table->dropPrimary();
 
-                $table->primary([$columnNames['team_foreign_key'], $pivotRole, $columnNames['model_morph_key'], 'model_type'],
-                    'model_has_roles_role_model_type_primary');
+                $table->primary(
+                    [$columnNames['team_foreign_key'], $pivotRole, $columnNames['model_morph_key'], 'model_type'],
+                    'model_has_roles_role_model_type_primary'
+                );
                 if (DB::getDriverName() !== 'sqlite') {
                     $table->foreign($pivotRole)
                         ->references('id')->on($tableNames['roles'])->onDelete('cascade');
@@ -84,8 +88,5 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down(): void
-    {
-
-    }
+    public function down(): void {}
 };

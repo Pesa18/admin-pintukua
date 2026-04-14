@@ -11,8 +11,12 @@
         "bezhansalleh/filament-shield": "^3.2",
         "dotswan/filament-map-picker": "^1.4",
         "filament/filament": "^3.2",
+        "firebase/php-jwt": "^6.11",
         "laravel/framework": "^11.9",
+        "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
+        "monzer/filament-chatify-integration": "^1.0",
+        "solution-forest/filament-access-management": "^2.2",
         "stevebauman/location": "^7.4"
     },
     "require-dev": {

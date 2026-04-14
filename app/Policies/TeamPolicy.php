@@ -13,7 +13,7 @@ class TeamPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->checkPermissionTo('view-any Team');
+        return $user->checkPermissionTo('lihat-semua Team');
     }
 
     /**
@@ -21,7 +21,7 @@ class TeamPolicy
      */
     public function view(User $user, Team $team): bool
     {
-        return $user->checkPermissionTo('view Team');
+        return $user->checkPermissionTo('lihat Team');
     }
 
     /**
@@ -29,7 +29,6 @@ class TeamPolicy
      */
     public function create(User $user): bool
     {
-
         return $user->checkPermissionTo('create Team');
     }
 

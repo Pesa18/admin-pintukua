@@ -21,7 +21,7 @@ return [
      * Set as false to remove from navigation.
      */
     'should_register_on_navigation' => [
-        'permissions' => false,
+        'permissions' => true,
         'roles' => true,
     ],
 
@@ -117,8 +117,8 @@ return [
              * Permissions Aligned with Policies.
              * DO NOT change the keys unless the genericPolicy.stub is published and altered accordingly
              */
-            'viewAnyPermission' => 'view-any',
-            'viewPermission' => 'view',
+            'viewAnyPermission' => 'lihat-semua',
+            'viewPermission' => 'lihat',
             'createPermission' => 'create',
             'updatePermission' => 'update',
             'deletePermission' => 'delete',

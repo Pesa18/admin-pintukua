@@ -13,9 +13,9 @@ class ArticleObserver
     {
 
         if (auth()->hasUser()) {
-            $article->team_id = auth()->user()->team_id;
+            $article->team_id = getPermissionsTeamId();
             // or with a `team` relationship defined:
-            $article->team()->associate(auth()->user()->team);
+            $article->team()->associate(getPermissionsTeamId());
             $article->save();
         }
     }

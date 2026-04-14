@@ -13,11 +13,13 @@ class RegisterTeam extends RegisterTenant
 
     public static function canView(): bool
     {
-        $superadmin = auth()->user()->team_id;
-        if ($superadmin == 1) {
-            return true;
-        }
-        return false;
+        // $superadmin  = auth()->user()->teams()->first()?->id;
+
+
+        // if ($superadmin == 1) {
+        //     return true;
+        // }
+        return true;
     }
 
     public static function getLabel(): string

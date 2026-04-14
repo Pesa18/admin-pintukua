@@ -13,7 +13,7 @@ class ProfileCompanyPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->checkPermissionTo('view-any ProfileCompany');
+        return $user->checkPermissionTo('lihat-semua ProfileCompany');
     }
 
     /**
@@ -21,7 +21,7 @@ class ProfileCompanyPolicy
      */
     public function view(User $user, ProfileCompany $profilecompany): bool
     {
-        return $user->checkPermissionTo('view ProfileCompany');
+        return $user->checkPermissionTo('lihat ProfileCompany');
     }
 
     /**

@@ -13,7 +13,7 @@ class RolePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->checkPermissionTo('view-any Role');
+        return $user->checkPermissionTo('lihat-semua Role');
     }
 
     /**
@@ -21,7 +21,7 @@ class RolePolicy
      */
     public function view(User $user, Role $role): bool
     {
-        return $user->checkPermissionTo('view Role');
+        return $user->checkPermissionTo('lihat Role');
     }
 
     /**

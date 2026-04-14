@@ -13,7 +13,7 @@ class KuaTeamPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->checkPermissionTo('view-any KuaTeam');
+        return $user->checkPermissionTo('lihat-semua KuaTeam');
     }
 
     /**
@@ -21,7 +21,7 @@ class KuaTeamPolicy
      */
     public function view(User $user, KuaTeam $kuateam): bool
     {
-        return $user->checkPermissionTo('view KuaTeam');
+        return $user->checkPermissionTo('lihat KuaTeam');
     }
 
     /**

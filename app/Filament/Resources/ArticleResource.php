@@ -47,18 +47,18 @@ class ArticleResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $tenantRelationshipName = 'articleTeams';
 
-    public static function getEloquentQuery(): Builder
-    {
-        $id_kua = auth()->user()->kua()->first()?->id_kua;
+    // public static function getEloquentQuery(): Builder
+    // {
+    //     $id_kua = auth()->user()->kua()->first()?->id_kua;
 
-        if (auth()->user()->isSuperAdmin() || auth()->user()->isEditor() || auth()->user()->isAdmin()) {
-            return parent::getEloquentQuery()->withoutGlobalScopes();
-        }
 
-        return parent::getEloquentQuery()->whereHas('kua', function ($query) use ($id_kua) {
-            $query->where('kua_user.id_kua', $id_kua);
-        });
-    }
+    //     return parent::getEloquentQuery()->withoutGlobalScopes();
+
+
+    //     // return parent::getEloquentQuery()->whereHas('kua', function ($query) use ($id_kua) {
+    //     //     $query->where('kua_user.id_kua', $id_kua);
+    //     // });
+    // }
 
     public static function isScopedToTenant(): bool
     {

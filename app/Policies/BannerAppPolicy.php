@@ -13,7 +13,7 @@ class BannerAppPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->checkPermissionTo('view-any BannerApp');
+        return $user->checkPermissionTo('lihat-semua BannerApp');
     }
 
     /**
@@ -21,7 +21,7 @@ class BannerAppPolicy
      */
     public function view(User $user, BannerApp $bannerapp): bool
     {
-        return $user->checkPermissionTo('view BannerApp');
+        return $user->checkPermissionTo('lihat BannerApp');
     }
 
     /**

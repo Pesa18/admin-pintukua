@@ -24,11 +24,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Storage;
+use SolutionForest\FilamentAccessManagement\Concerns\FilamentUserHelpers;
 use Spatie\Permission\Models\Role;
 
 class User extends Authenticatable implements HasTenants, HasAvatar
 {
-    use HasFactory, Notifiable, HasRoles, HasSuperAdmin, HasUserkua;
+    use HasFactory, Notifiable, HasRoles, HasUserkua, HasSuperAdmin;
 
     /**
      * The attributes that are mass assignable.
@@ -88,17 +89,7 @@ class User extends Authenticatable implements HasTenants, HasAvatar
     {
         return $this->belongsTo(Team::class);
     }
-    protected static function booted(): void
-    {
-        static::addGlobalScope('team', function (Builder $query) {
-            if (auth()->hasUser()) {
-                $query->where('team_id', getPermissionsTeamId());
-                // or with a `team` relationship defined:
-                $query->whereBelongsTo(auth()->user()->teams);
-            }
-            // dd(auth()->check());
-        });
-    }
+    protected static function booted(): void {}
     public function kepalaEmployees()
     {
         return $this->hasMany(Employee::class, 'id_kua', 'id_kua')

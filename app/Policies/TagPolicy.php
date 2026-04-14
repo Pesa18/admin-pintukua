@@ -13,7 +13,7 @@ class TagPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->checkPermissionTo('view-any Tag');
+        return $user->checkPermissionTo('lihat-semua Tag');
     }
 
     /**
@@ -21,7 +21,7 @@ class TagPolicy
      */
     public function view(User $user, Tag $tag): bool
     {
-        return $user->checkPermissionTo('view Tag');
+        return $user->checkPermissionTo('lihat Tag');
     }
 
     /**

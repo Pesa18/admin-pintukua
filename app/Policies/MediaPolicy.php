@@ -13,7 +13,7 @@ class MediaPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->checkPermissionTo('view-any Media');
+        return $user->checkPermissionTo('lihat-semua Media');
     }
 
     /**
@@ -21,7 +21,7 @@ class MediaPolicy
      */
     public function view(User $user, Media $media): bool
     {
-        return $user->checkPermissionTo('view Media');
+        return $user->checkPermissionTo('lihat Media');
     }
 
     /**

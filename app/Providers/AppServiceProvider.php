@@ -45,8 +45,8 @@ class AppServiceProvider extends ServiceProvider
             // dd(Auth::user()->getRoleNames());
             // dd($user->isUserkua());
 
-            return $user->isSuperAdmin() ? true : null;
-            // return true;
+            // return $user->isSuperAdmin() ? true : null;
+            return true;
         });
         Gate::policy(Team::class, TeamPolicy::class);
         // Gate::policy(Permission::class, PermissionPolicy::class);

@@ -12,9 +12,9 @@ return new class extends Migration {
     {
         Schema::create('otps', function (Blueprint $table) {
             $table->id(); // id auto increment
-            $table->uuid('user_id'); // UUID sesuai dengan tabel user_accounts
+            $table->uuid('user_id'); // Foreign key ke user_accounts
             $table->string('otp'); // Menyimpan kode OTP
-            $table->dateTime('expires_at'); // Waktu kadaluwarsa OTP
+            $table->timestamp('expires_at'); // Waktu kadaluwarsa OTP
             $table->boolean('is_used')->default(false); // Status apakah sudah digunakan
             $table->timestamps(); // created_at & updated_at otomatis
 
@@ -22,8 +22,7 @@ return new class extends Migration {
             $table->foreign('user_id')
                 ->references('uuid')
                 ->on('user_accounts')
-                ->onDelete('cascade') // Jika user dihapus, OTP juga dihapus
-                ->onUpdate('no action');
+                ->onDelete('cascade'); // Jika user dihapus, OTP juga dihapus
         });
     }
 

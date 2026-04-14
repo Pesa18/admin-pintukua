@@ -13,12 +13,9 @@ class UserObserver
     public function created(User $user): void
     {
         if (auth()->hasUser()) {
-            $user->team_id = getPermissionsTeamId();
-            // or with a `team` relationship defined:
-            $user->save();
 
             // Ambil tim berdasarkan team_id yang baru saja disetel
-            $team = Team::find($user->team_id);
+            $team = Team::find(getPermissionsTeamId());
 
             // Pastikan tim ditemukan sebelum mengaitkan anggota
             if ($team) {
